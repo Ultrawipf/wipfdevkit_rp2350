@@ -1,14 +1,19 @@
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
+from adafruit_hid import supervisor
 import time
 from wipf import *
 
 class Wipfkeyboard:
     KEYMAP = [Keycode.D,Keycode.V,Keycode.C,Keycode.X,Keycode.S,Keycode.Z,Keycode.A,Keycode.F]
     def __init__(self):
+        if not supervisor.runtime.usb_connected:
+            raise RuntimeError("USB not connected")
         self.lastkeys = [False * len(BUTTONPINS)]
         self.kbd = Keyboard(usb_hid.devices)
+        print("USB:",supervisor.runtime.usb_connected)
+
 
     def keyboard_update(self,buttonstates):
         if(len(buttonstates) != len(self.lastkeys)):
