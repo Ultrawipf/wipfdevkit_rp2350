@@ -33,18 +33,25 @@ PINBUZZER = board.GP1
 BUZZER_PWM = None #pwmio.PWMOut(PINBUZZER, variable_frequency=True)
 BUZZER_AUD = None
 
-I2C_INT = I2C(scl=board.GP3,sda=board.GP2,frequency=400000)
+
 I2C_EXT = I2C(scl=microcontroller.pin.GPIO29,sda=board.GP28,frequency=400000)
+I2C_INT = I2C(scl=board.GP3,sda=board.GP2,frequency=400000)
 I2C_EXT.try_lock()
 devs = I2C_EXT.scan()
 I2C_EXT.unlock()
 print('I2C EXT',devs)
+I2C_INT.try_lock()
+devs = I2C_INT.scan()
+I2C_INT.unlock()
+print('I2C INT',devs)
 
 
-for i in range(10):
+for i in range(4):
     try:
         time.sleep(0.2) # Ensure accelerometer is found
         ACCELEROMETER = adafruit_mma8451.MMA8451(I2C_INT,address=0x1C)
+        ACCELEROMETER.data_rate = adafruit_mma8451.DATARATE_200HZ
+        #ACCELEROMETER.range=adafruit_mma8451.RANGE_8G
         print("Found accelerometer")
         break
     except Exception as e:
@@ -54,7 +61,9 @@ for i in range(10):
         # I2C_INT.unlock()
         ACCELEROMETER = None
         print("Accelerometer error",e)
+        raise e
         time.sleep(1)
+        
         
 
 
