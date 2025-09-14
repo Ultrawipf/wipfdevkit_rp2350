@@ -137,7 +137,9 @@ class MMA8451:
             raise RuntimeError("Failed to find MMA8451, check wiring!")
         # Reset and wait for chip to be ready.
         self._write_u8(_MMA8451_REG_CTRL_REG2, 0x40)
+        time.sleep(0.001)
         while self._read_u8(_MMA8451_REG_CTRL_REG2) & 0x40 > 0:
+            time.sleep(0.001)
             pass
         # Enable 4G range.
         self._write_u8(_MMA8451_REG_XYZ_DATA_CFG, RANGE_4G)
@@ -167,7 +169,7 @@ class MMA8451:
             pass
         #self.i2c.write_then_readinto(bytes([address & 0xFF]), buf, in_end=count)
         self.i2c.writeto_then_readfrom(self.addr,bytes([address & 0xFF]), buf,out_end=1, in_end=count)
-        time.sleep(0.001)
+        
         self.i2c.unlock()
     def _read_u8(self, address: int) -> int:
         # Read an 8-bit unsigned value from the specified 8-bit address.
@@ -183,7 +185,7 @@ class MMA8451:
         self._BUFFER[1] = val & 0xFF
         #self.i2c.write(self._BUFFER, end=2)
         self.i2c.writeto(self.addr,self._BUFFER, end=2)
-        time.sleep(0.001)
+        
         self.i2c.unlock()
 
     @property
